@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面｜ECCジュニア 中島教室</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green: #2d8c4e; --green-light: #e8f5ed;
+      --cream: #faf8f4; --warm: #f5f0e8;
+      --text: #1a1a1a; --text-mid: #555; --text-light: #888;
+      --border: #e8e2d9; --red: #dc2626; --red-light: #fef2f2;
+    }
+    body { font-family: -apple-system, 'Noto Sans JP', sans-serif; background: var(--cream); color: var(--text); }
+
+    /* ── ログイン画面 ── */
+    .login-wrap {
+      min-height: 100vh; display: flex;
+      align-items: center; justify-content: center;
+      background: var(--warm);
+    }
+    .login-box {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px 36px;
+      width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    }
+    .login-logo { font-size: 13px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+    .login-title { font-size: 22px; font-weight: 700; margin-bottom: 28px; }
+    .login-group { margin-bottom: 16px; }
+    .login-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+    .login-group input {
+      width: 100%; padding: 10px 14px; font-size: 14px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      outline: none; transition: border-color 0.18s; background: var(--cream);
+    }
+    .login-group input:focus { border-color: var(--green); background: #fff; }
+    .login-btn {
+      width: 100%; padding: 12px; font-size: 14px; font-weight: 700;
+      color: #fff; background: var(--green); border: none;
+      border-radius: 8px; cursor: pointer; margin-top: 8px; transition: all 0.18s;
+    }
+    .login-btn:hover { background: #236b3d; }
+    .login-error { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+
+    /* ── 管理画面本体 ── */
+    .admin-wrap { display: none; min-height: 100vh; }
+
+    /* サイドバー */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 220px; background: #1a1a1a;
+      display: flex; flex-direction: column;
+      padding: 24px 0;
+    }
+    .sidebar-logo {
+      padding: 0 20px 24px;
+      font-size: 13px; font-weight: 700;
+      color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo span { color: var(--green); }
+    .sidebar-logo small { display: block; font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; font-weight: 400; }
+    .sidebar-nav { padding: 16px 12px; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 13px; color: rgba(255,255,255,0.6);
+      cursor: pointer; transition: all 0.18s; margin-bottom: 2px;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .nav-item.active { background: rgba(45,140,78,0.2); color: var(--green); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 13px; color: rgba(255,255,255,0.4);
+      cursor: pointer; transition: all 0.18s;
+      border: none; background: none; width: 100%;
+    }
+    .logout-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+    /* メインエリア */
+    .main { margin-left: 220px; padding: 32px; }
+    .page-header { margin-bottom: 28px; }
+    .page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .page-sub { font-size: 13px; color: var(--text-light); }
+
+    /* 統計カード */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .stat-card .label { font-size: 11px; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; color: var(--text); }
+    .stat-card .value.green { color: var(--green); }
+    .stat-card .value.red { color: var(--red); }
+
+    /* フィルター */
+    .filter-bar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px; font-size: 12px;
+      font-weight: 600; cursor: pointer; border: 1.5px solid var(--border);
+      background: #fff; color: var(--text-mid); transition: all 0.18s;
+    }
+    .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .filter-btn:hover:not(.active) { border-color: #bbb; }
+    .search-input {
+      padding: 7px 14px; border: 1.5px solid var(--border);
+      border-radius: 20px; font-size: 13px; outline: none;
+      width: 220px; background: #fff; transition: border-color 0.18s;
+    }
+    .search-input:focus { border-color: var(--green); }
+
+    /* テーブル */
+    .table-wrap {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--warm); }
+    th {
+      padding: 12px 16px; text-align: left;
+      font-size: 11px; font-weight: 700;
+      color: var(--text-light); letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px 16px; font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--cream); }
+
+    /* バッジ */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-new { background: #fef3c7; color: #92400e; }
+    .badge-done { background: var(--green-light); color: var(--green); }
+    .badge-type { background: var(--warm); color: var(--text-mid); }
+
+    /* アクションボタン */
+    .action-btn {
+      padding: 5px 12px; border-radius: 6px; font-size: 12px;
+      font-weight: 600; cursor: pointer; border: 1.5px solid;
+      transition: all 0.18s;
+    }
+    .btn-reply {
+      background: var(--green-light); color: var(--green);
+      border-color: rgba(45,140,78,0.3);
+    }
+    .btn-reply:hover { background: var(--green); color: #fff; }
+    .btn-unreply {
+      background: var(--warm); color: var(--text-mid);
+      border-color: var(--border);
+    }
+    .btn-unreply:hover { background: #fff; border-color: #bbb; }
+
+    /* 詳細モーダル */
+    .modal-overlay {
+      display: none; position: fixed;
+      inset: 0; background: rgba(0,0,0,0.45);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 16px;
+      padding: 32px; width: 520px; max-width: 90vw;
+      max-height: 80vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close { font-size: 20px; cursor: pointer; color: var(--text-light); background: none; border: none; }
+    .modal-close:hover { color: var(--text); }
+    .modal-row { margin-bottom: 16px; }
+    .modal-label { font-size: 11px; font-weight: 700; color: var(--text-light); letter-spacing: 0.5px; margin-bottom: 4px; }
+    .modal-value { font-size: 14px; color: var(--text); line-height: 1.7; }
+    .modal-message {
+      background: var(--cream); border-radius: 8px;
+      padding: 12px 14px; font-size: 14px; line-height: 1.7;
+    }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      border: 1.5px solid; transition: all 0.18s;
+    }
+    .modal-btn-main { background: var(--green); color: #fff; border-color: var(--green); }
+    .modal-btn-main:hover { background: #236b3d; }
+    .modal-btn-sub { background: #fff; color: var(--text-mid); border-color: var(--border); }
+    .modal-btn-sub:hover { border-color: #bbb; }
+
+    /* ページ */
+    .section-page { display: none; }
+    .section-page.active { display: block; }
+
+    /* ローディング */
+    .loading { text-align: center; padding: 48px; color: var(--text-light); font-size: 14px; }
+    .empty { text-align: center; padding: 48px; color: var(--text-light); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">ECCジュニア 中島教室</div>
+    <div class="login-title">管理画面にログイン</div>
+    <div class="login-group">
+      <label>メールアドレス</label>
+      <input type="email" id="login-email" placeholder="admin@example.com">
+    </div>
+    <div class="login-group">
+      <label>パスワード</label>
+      <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="login-error">メールアドレスまたはパスワードが違います。</div>
+    <button class="login-btn" onclick="doLogin()">ログイン</button>
+  </div>
+</div>
+
+<!-- 管理画面本体 -->
+<div class="admin-wrap" id="admin-wrap">
+
+  <!-- サイドバー -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      ECC<span>ジュニア</span> 中島教室<br>
+      <small>管理画面</small>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('inquiries', this)">
+        <span class="nav-icon">📋</span> 問い合わせ
+      </button>
+      <button class="nav-item" onclick="showPage('reports', this)">
+        <span class="nav-icon">📝</span> レッスンレポート
+      </button>
+      <button class="nav-item" onclick="showPage('students', this)">
+        <span class="nav-icon">👦</span> 生徒一覧
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">
+        <span class="nav-icon">🚪</span> ログアウト
+      </button>
+    </div>
+  </div>
+
+  <!-- メイン -->
+  <div class="main">
+
+    <!-- 問い合わせページ -->
+    <div class="section-page active" id="page-inquiries">
+      <div class="page-header">
+        <div class="page-title">問い合わせ管理</div>
+        <div class="page-sub">体験申込・お問い合わせの一覧です</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="label">総件数</div><div class="value" id="stat-total">-</div></div>
+        <div class="stat-card"><div class="label">未返信</div><div class="value red" id="stat-new">-</div></div>
+        <div class="stat-card"><div class="label">返信済み</div><div class="value green" id="stat-done">-</div></div>
+        <div class="stat-card"><div class="label">今月</div><div class="value" id="stat-month">-</div></div>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter('all', this)">すべて</button>
+        <button class="filter-btn" onclick="setFilter('new', this)">未返信</button>
+        <button class="filter-btn" onclick="setFilter('done', this)">返信済み</button>
+        <input class="search-input" type="text" placeholder="名前・メールで検索..." oninput="renderTable()" id="search-input">
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>状態</th>
+              <th>日時</th>
+              <th>お名前</th>
+              <th>メール</th>
+              <th>種別</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="inquiry-tbody">
+            <tr><td colspan="6" class="loading">読み込み中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- レッスンレポートページ -->
+    <div class="section-page" id="page-reports">
+      <div class="page-header">
+        <div class="page-title">レッスンレポート</div>
+        <div class="page-sub">生徒へのレポート作成・LINE送信</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px;text-align:center;color:var(--text-light);">
+        <div style="font-size:36px;margin-bottom:12px;">📝</div>
+        <div style="font-weight:700;margin-bottom:6px;">レポート機能は近日公開</div>
+        <div style="font-size:13px;">生徒を選んでレポートを作成し、LINEで送信できるようになります。</div>
+      </div>
+    </div>
+
+    <!-- 生徒一覧ページ -->
+    <div class="section-page" id="page-students">
+      <div class="page-header">
+        <div class="page-title">生徒一覧</div>
+        <div class="page-sub">登録されている生徒の一覧です</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>名前</th><th>学年</th><th>曜日</th><th>入会日</th></tr>
+          </thead>
+          <tbody id="students-tbody">
+            <tr><td colspan="4" class="loading">読み込み中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 詳細モーダル -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">お問い合わせ詳細</div>
+      <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-row"><div class="modal-label">状態</div><div class="modal-value" id="md-status"></div></div>
+    <div class="modal-row"><div class="modal-label">受信日時</div><div class="modal-value" id="md-date"></div></div>
+    <div class="modal-row"><div class="modal-label">お名前</div><div class="modal-value" id="md-name"></div></div>
+    <div class="modal-row"><div class="modal-label">メール</div><div class="modal-value" id="md-email"></div></div>
+    <div class="modal-row"><div class="modal-label">種別</div><div class="modal-value" id="md-type"></div></div>
+    <div class="modal-row"><div class="modal-label">メッセージ</div><div class="modal-message" id="md-message"></div></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-main" id="md-toggle-btn" onclick="toggleFromModal()">返信済みにする</button>
+      <button class="modal-btn modal-btn-sub" onclick="document.getElementById('modal-overlay').classList.remove('open')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ========================================
+  // ⚠️ ここを自分のSupabase情報に書き換える
+  // ========================================
+  const SUPABASE_URL  = 'https://oyptlspwkahlwwmwvuzm.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95cHRsc3B3a2FobHd3bXd2dXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NTA2MDgsImV4cCI6MjA5MDMyNjYwOH0.sUgKk_OlIII5JvqY1EMe9P1IX9tef_4KCzkE7Ymm8PY'
+  // ========================================
+
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  let allInquiries = []
+  let currentFilter = 'all'
+  let currentModalId = null
+
+  // ── ログイン ──
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim()
+    const pass  = document.getElementById('login-pass').value
+    const errEl = document.getElementById('login-error')
+    errEl.style.display = 'none'
+
+    const { error } = await db.auth.signInWithPassword({ email, password: pass })
+    if (error) {
+      errEl.style.display = 'block'
+      return
+    }
+    showAdmin()
+  }
+
+  async function doLogout() {
+    await db.auth.signOut()
+    document.getElementById('admin-wrap').style.display = 'none'
+    document.getElementById('login-wrap').style.display = 'flex'
+  }
+
+  function showAdmin() {
+    document.getElementById('login-wrap').style.display = 'none'
+    document.getElementById('admin-wrap').style.display = 'block'
+    loadInquiries()
+    loadStudents()
+  }
+
+  // ── セッション確認（リロード時） ──
+  db.auth.getSession().then(({ data }) => {
+    if (data.session) showAdmin()
+  })
+
+  // ── ページ切替 ──
+  function showPage(page, btn) {
+    document.querySelectorAll('.section-page').forEach(el => el.classList.remove('active'))
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
+    document.getElementById('page-' + page).classList.add('active')
+    btn.classList.add('active')
+  }
+
+  // ── 問い合わせ読み込み ──
+  async function loadInquiries() {
+    const { data, error } = await db
+      .from('inquiries')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) { console.error(error); return }
+    allInquiries = data || []
+    updateStats()
+    renderTable()
+  }
+
+  function updateStats() {
+    const total = allInquiries.length
+    const done  = allInquiries.filter(i => i.is_replied).length
+    const newC  = total - done
+    const now   = new Date()
+    const month = allInquiries.filter(i => {
+      const d = new Date(i.created_at)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    }).length
+    document.getElementById('stat-total').textContent = total
+    document.getElementById('stat-new').textContent   = newC
+    document.getElementById('stat-done').textContent  = done
+    document.getElementById('stat-month').textContent = month
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    renderTable()
+  }
+
+  function renderTable() {
+    const q = (document.getElementById('search-input').value || '').toLowerCase()
+    let rows = allInquiries
+
+    if (currentFilter === 'new')  rows = rows.filter(i => !i.is_replied)
+    if (currentFilter === 'done') rows = rows.filter(i => i.is_replied)
+    if (q) rows = rows.filter(i =>
+      (i.name||'').toLowerCase().includes(q) ||
+      (i.email||'').toLowerCase().includes(q)
+    )
+
+    const tbody = document.getElementById('inquiry-tbody')
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">該当する問い合わせがありません</td></tr>'
+      return
+    }
+
+    tbody.innerHTML = rows.map(i => {
+      const date = new Date(i.created_at).toLocaleString('ja-JP', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' })
+      const badge = i.is_replied
+        ? '<span class="badge badge-done">返信済み</span>'
+        : '<span class="badge badge-new">未返信</span>'
+      const btn = i.is_replied
+        ? `<button class="action-btn btn-unreply" onclick="toggleReply('${i.id}',false)">未返信に戻す</button>`
+        : `<button class="action-btn btn-reply"   onclick="toggleReply('${i.id}',true)">返信済みにする</button>`
+      return `<tr style="cursor:pointer" onclick="openModal('${i.id}')">
+        <td>${badge}</td>
+        <td style="color:var(--text-light)">${date}</td>
+        <td style="font-weight:600">${i.name||'-'}</td>
+        <td style="color:var(--text-mid)">${i.email||'-'}</td>
+        <td><span class="badge badge-type">${i.inquiry_type||'-'}</span></td>
+        <td onclick="event.stopPropagation()">${btn}</td>
+      </tr>`
+    }).join('')
+  }
+
+  async function toggleReply(id, val) {
+    const { error } = await db.from('inquiries').update({ is_replied: val }).eq('id', id)
+    if (!error) {
+      const item = allInquiries.find(i => i.id === id)
+      if (item) item.is_replied = val
+      updateStats()
+      renderTable()
+      if (currentModalId === id) updateModalBtn(val)
+    }
+  }
+
+  // ── モーダル ──
+  function openModal(id) {
+    const i = allInquiries.find(x => x.id === id)
+    if (!i) return
+    currentModalId = id
+    const date = new Date(i.created_at).toLocaleString('ja-JP')
+    document.getElementById('md-date').textContent    = date
+    document.getElementById('md-name').textContent    = i.name || '-'
+    document.getElementById('md-email').textContent   = i.email || '-'
+    document.getElementById('md-type').textContent    = i.inquiry_type || '-'
+    document.getElementById('md-message').textContent = i.message || '（メッセージなし）'
+    document.getElementById('md-status').innerHTML    = i.is_replied
+      ? '<span class="badge badge-done">返信済み</span>'
+      : '<span class="badge badge-new">未返信</span>'
+    updateModalBtn(i.is_replied)
+    document.getElementById('modal-overlay').classList.add('open')
+  }
+
+  function updateModalBtn(isReplied) {
+    const btn = document.getElementById('md-toggle-btn')
+    if (isReplied) {
+      btn.textContent = '未返信に戻す'
+      btn.style.background = 'var(--warm)'
+      btn.style.color = 'var(--text-mid)'
+      btn.style.borderColor = 'var(--border)'
+    } else {
+      btn.textContent = '返信済みにする ✓'
+      btn.style.background = 'var(--green)'
+      btn.style.color = '#fff'
+      btn.style.borderColor = 'var(--green)'
+    }
+    const i = allInquiries.find(x => x.id === currentModalId)
+    document.getElementById('md-status').innerHTML = isReplied
+      ? '<span class="badge badge-done">返信済み</span>'
+      : '<span class="badge badge-new">未返信</span>'
+  }
+
+  function toggleFromModal() {
+    const i = allInquiries.find(x => x.id === currentModalId)
+    if (i) toggleReply(currentModalId, !i.is_replied)
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modal-overlay'))
+      document.getElementById('modal-overlay').classList.remove('open')
+  }
+
+  // ── 生徒一覧 ──
+  async function loadStudents() {
+    const { data, error } = await db.from('students').select('*').order('created_at', { ascending: false })
+    const tbody = document.getElementById('students-tbody')
+    if (error || !data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty">生徒が登録されていません</td></tr>'
+      return
+    }
+    tbody.innerHTML = data.map(s => `<tr>
+      <td style="font-weight:600">${s.name}</td>
+      <td>${s.grade||'-'}</td>
+      <td>${s.class_day||'-'}</td>
+      <td style="color:var(--text-light)">${s.joined_at||'-'}</td>
+    </tr>`).join('')
+  }
+</script>
+</body>
+</html>
