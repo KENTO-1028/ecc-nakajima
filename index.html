@@ -6,521 +6,95 @@
   <title>ECCジュニア 中島教室｜子どもの英語教室</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
-      --green:      #2d8c4e;
-      --green-light:#e8f5ed;
-      --green-mid:  #4aab6d;
-      --cream:      #faf8f4;
-      --warm:       #f5f0e8;
-      --text:       #1a1a1a;
-      --text-mid:   #555;
-      --text-light: #888;
-      --border:     #e8e2d9;
+      --green:#2d8c4e; --green-light:#e8f5ed; --green-mid:#4aab6d;
+      --cream:#faf8f4; --warm:#f5f0e8; --text:#1a1a1a;
+      --text-mid:#555; --text-light:#888; --border:#e8e2d9;
     }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Noto Sans JP', sans-serif;
-      background: var(--cream);
-      color: var(--text);
-      line-height: 1.7;
-    }
-
-    /* ── ヘッダー ── */
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(250,248,244,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.2px;
-    }
-
-    .logo em {
-      font-style: normal;
-      color: var(--green);
-    }
-
-    nav { display: flex; align-items: center; gap: 8px; }
-
-    nav a {
-      font-size: 13px;
-      color: var(--text-mid);
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 20px;
-      transition: all 0.18s;
-    }
-
-    nav a:hover { color: var(--text); background: var(--warm); }
-
-    .nav-cta {
-      background: var(--green) !important;
-      color: #fff !important;
-      font-weight: 600;
-      padding: 8px 18px !important;
-    }
-
-    .nav-cta:hover { background: #236b3d !important; }
-
-    /* ── ヒーロー ── */
-    .hero {
-      padding: 140px 32px 80px;
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: center;
-    }
-
-    @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; padding: 100px 20px 60px; gap: 40px; }
-    }
-
-    .hero-left {}
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--green);
-      background: var(--green-light);
-      border-radius: 4px;
-      padding: 4px 10px;
-      margin-bottom: 20px;
-      letter-spacing: 0.5px;
-    }
-
-    .hero-eyebrow::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--green);
-      border-radius: 50%;
-    }
-
-    .hero h1 {
-      font-family: 'Zen Kaku Gothic New', sans-serif;
-      font-size: clamp(28px, 4vw, 46px);
-      font-weight: 700;
-      line-height: 1.35;
-      letter-spacing: -0.5px;
-      margin-bottom: 20px;
-      color: var(--text);
-    }
-
-    .hero h1 .underline {
-      position: relative;
-      display: inline;
-    }
-
-    .hero h1 .underline::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 8px;
-      background: rgba(74,171,109,0.25);
-      border-radius: 4px;
-      z-index: -1;
-    }
-
-    .hero-desc {
-      font-size: 15px;
-      color: var(--text-mid);
-      line-height: 1.9;
-      margin-bottom: 36px;
-      max-width: 420px;
-    }
-
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 13px 24px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: all 0.18s;
-    }
-
-    .btn-main {
-      background: var(--green);
-      color: #fff;
-      box-shadow: 0 2px 12px rgba(45,140,78,0.25);
-    }
-
-    .btn-main:hover {
-      background: #236b3d;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(45,140,78,0.3);
-    }
-
-    .btn-ghost {
-      background: #fff;
-      color: var(--text);
-      border: 1.5px solid var(--border);
-    }
-
-    .btn-ghost:hover { border-color: #bbb; background: var(--warm); }
-
-    /* ── ヒーロー右：LINEモックアップ ── */
-    .hero-right {
-      display: flex;
-      justify-content: center;
-    }
-
-    .phone-wrap {
-      position: relative;
-    }
-
-    .phone-wrap::before {
-      content: '毎回届くレポート💌';
-      position: absolute;
-      top: -14px; right: -12px;
-      background: #fff3cd;
-      border: 1px solid #f0d080;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #7a5c00;
-      padding: 4px 10px;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .phone {
-      width: 240px;
-      background: #1c1c1e;
-      border-radius: 36px;
-      padding: 16px 12px;
-      box-shadow:
-        0 32px 64px rgba(0,0,0,0.18),
-        0 0 0 1px rgba(255,255,255,0.08);
-    }
-
-    .phone-screen {
-      background: #efeff4;
-      border-radius: 26px;
-      overflow: hidden;
-    }
-
-    .line-bar {
-      background: #00b900;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .line-bar-icon {
-      width: 30px; height: 30px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
-    }
-
-    .line-bar-info .n { font-size: 12px; font-weight: 700; color: #fff; }
-    .line-bar-info .s { font-size: 10px; color: rgba(255,255,255,0.75); }
-
-    .line-body { padding: 10px 10px 14px; display: flex; flex-direction: column; gap: 8px; }
-
-    .lm {
-      background: #fff;
-      border-radius: 3px 10px 10px 10px;
-      padding: 8px 10px;
-      font-size: 10.5px;
-      color: #1a1a1a;
-      line-height: 1.65;
-      max-width: 92%;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-      opacity: 0;
-      animation: popIn 0.35s ease forwards;
-    }
-
-    .lm:nth-child(1) { animation-delay: 0.4s; }
-    .lm:nth-child(2) { animation-delay: 1.0s; }
-    .lm:nth-child(3) { animation-delay: 1.7s; }
-
-    .lm-name { font-size: 9.5px; color: #00b900; font-weight: 700; margin-bottom: 3px; }
-
-    .lm-img {
-      width: 100%;
-      height: 64px;
-      background: linear-gradient(135deg, #a8edca, #4aab6d);
-      border-radius: 6px;
-      margin-top: 5px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-
-    @keyframes popIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── 3つの特徴 ── */
-    .trust-bar {
-      background: #fff;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 36px 32px;
-    }
-
-    .trust-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-around;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-
-    .trust-item {
-      text-align: center;
-      flex: 1;
-      min-width: 160px;
-    }
-
-    .trust-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    .trust-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .trust-sub {
-      font-size: 11.5px;
-      color: var(--text-light);
-      line-height: 1.6;
-    }
-
-    /* ── LINEレポートセクション ── */
-    .section {
-      padding: 96px 32px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .section-tag {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--green);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-family: 'Zen Kaku Gothic New', sans-serif;
-      font-size: clamp(22px, 3.5vw, 36px);
-      font-weight: 700;
-      line-height: 1.4;
-      letter-spacing: -0.3px;
-      margin-bottom: 16px;
-    }
-
-    .section-lead {
-      font-size: 15px;
-      color: var(--text-mid);
-      line-height: 1.9;
-      max-width: 540px;
-      margin-bottom: 40px;
-    }
-
-    .diff-card {
-      background: var(--green-light);
-      border: 1.5px solid rgba(45,140,78,0.2);
-      border-radius: 12px;
-      padding: 18px 22px;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.75;
-    }
-
-    .diff-card strong { color: var(--green); }
-
-    .line-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: center;
-    }
-
-    @media (max-width: 700px) {
-      .line-layout { grid-template-columns: 1fr; }
-      .section { padding: 64px 20px; }
-    }
-
-    /* ── 声のセクション ── */
-    .voices-bg {
-      background: var(--warm);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .voices-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
-
-    .voice-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 22px;
-    }
-
-    .voice-stars { color: #f5a623; font-size: 13px; margin-bottom: 10px; }
-
-    .voice-text {
-      font-size: 13.5px;
-      color: var(--text-mid);
-      line-height: 1.8;
-      margin-bottom: 14px;
-    }
-
-    .voice-from {
-      font-size: 12px;
-      color: var(--text-light);
-      font-weight: 600;
-    }
-
-    /* ── 体験申込セクション ── */
-    .apply-section {
-      text-align: center;
-      padding: 96px 32px;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-
-    .apply-section .section-title { margin-bottom: 12px; }
-
-    .apply-section .section-lead {
-      margin: 0 auto 40px;
-      text-align: center;
-    }
-
-    .apply-form {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      text-align: left;
-    }
-
-    .form-group { margin-bottom: 18px; }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-      letter-spacing: 0.3px;
-    }
-
-    .form-group label .req {
-      color: var(--green);
-      margin-left: 4px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--cream);
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      outline: none;
-      transition: border-color 0.18s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--green);
-      background: #fff;
-    }
-
-    .form-group textarea { resize: vertical; min-height: 80px; }
-
-    .form-submit {
-      width: 100%;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      background: var(--green);
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.18s;
-      margin-top: 8px;
-    }
-
-    .form-submit:hover {
-      background: #236b3d;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(45,140,78,0.25);
-    }
-
-    .form-note {
-      text-align: center;
-      font-size: 11.5px;
-      color: var(--text-light);
-      margin-top: 14px;
-    }
-
-    /* ── フッター ── */
-    footer {
-      background: #1a1a1a;
-      color: rgba(255,255,255,0.4);
-      text-align: center;
-      padding: 40px 24px;
-      font-size: 12px;
-      line-height: 2;
-    }
-
-    footer strong { color: rgba(255,255,255,0.7); }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--cream); color:var(--text); line-height:1.7; }
+    header { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(250,248,244,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 32px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+    .logo { font-size:15px; font-weight:700; } .logo em { font-style:normal; color:var(--green); }
+    nav { display:flex; align-items:center; gap:8px; }
+    nav a { font-size:13px; color:var(--text-mid); text-decoration:none; padding:6px 12px; border-radius:20px; transition:all 0.18s; }
+    nav a:hover { color:var(--text); background:var(--warm); }
+    .nav-cta { background:var(--green) !important; color:#fff !important; font-weight:600; padding:8px 18px !important; }
+    .hero { padding:140px 32px 80px; max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+    @media(max-width:768px){ .hero{grid-template-columns:1fr;padding:100px 20px 60px;gap:40px;} }
+    .hero-eyebrow { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--green); background:var(--green-light); border-radius:4px; padding:4px 10px; margin-bottom:20px; }
+    .hero-eyebrow::before { content:''; width:6px; height:6px; background:var(--green); border-radius:50%; }
+    .hero h1 { font-family:'Zen Kaku Gothic New',sans-serif; font-size:clamp(28px,4vw,46px); font-weight:700; line-height:1.35; margin-bottom:20px; }
+    .hero h1 .underline { position:relative; display:inline; }
+    .hero h1 .underline::after { content:''; position:absolute; bottom:0; left:0; right:0; height:8px; background:rgba(74,171,109,0.25); border-radius:4px; z-index:-1; }
+    .hero-desc { font-size:15px; color:var(--text-mid); line-height:1.9; margin-bottom:36px; max-width:420px; }
+    .hero-actions { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:13px 24px; border-radius:8px; font-size:14px; font-weight:600; text-decoration:none; cursor:pointer; border:none; transition:all 0.18s; }
+    .btn-main { background:var(--green); color:#fff; box-shadow:0 2px 12px rgba(45,140,78,0.25); }
+    .btn-main:hover { background:#236b3d; transform:translateY(-1px); }
+    .btn-ghost { background:#fff; color:var(--text); border:1.5px solid var(--border); }
+    .btn-ghost:hover { border-color:#bbb; background:var(--warm); }
+    .hero-right { display:flex; justify-content:center; }
+    .phone-wrap { position:relative; }
+    .phone-wrap::before { content:'毎回届くレポート💌'; position:absolute; top:-14px; right:-12px; background:#fff3cd; border:1px solid #f0d080; border-radius:8px; font-size:11px; font-weight:600; color:#7a5c00; padding:4px 10px; white-space:nowrap; }
+    .phone { width:240px; background:#1c1c1e; border-radius:36px; padding:16px 12px; box-shadow:0 32px 64px rgba(0,0,0,0.18); }
+    .phone-screen { background:#efeff4; border-radius:26px; overflow:hidden; }
+    .line-bar { background:#00b900; padding:10px 14px; display:flex; align-items:center; gap:8px; }
+    .line-bar-icon { width:30px; height:30px; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; }
+    .line-bar-info .n { font-size:12px; font-weight:700; color:#fff; }
+    .line-bar-info .s { font-size:10px; color:rgba(255,255,255,0.75); }
+    .line-body { padding:10px 10px 14px; display:flex; flex-direction:column; gap:8px; }
+    .lm { background:#fff; border-radius:3px 10px 10px 10px; padding:8px 10px; font-size:10.5px; color:#1a1a1a; line-height:1.65; max-width:92%; opacity:0; animation:popIn 0.35s ease forwards; }
+    .lm:nth-child(1){animation-delay:0.4s} .lm:nth-child(2){animation-delay:1.0s} .lm:nth-child(3){animation-delay:1.7s}
+    .lm-name { font-size:9.5px; color:#00b900; font-weight:700; margin-bottom:3px; }
+    .lm-img { width:100%; height:64px; background:linear-gradient(135deg,#a8edca,#4aab6d); border-radius:6px; margin-top:5px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    @keyframes popIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .trust-bar { background:#fff; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:36px 32px; }
+    .trust-inner { max-width:900px; margin:0 auto; display:flex; justify-content:space-around; gap:32px; flex-wrap:wrap; }
+    .trust-item { text-align:center; flex:1; min-width:160px; }
+    .trust-icon { font-size:28px; margin-bottom:8px; }
+    .trust-label { font-size:13px; font-weight:700; margin-bottom:4px; }
+    .trust-sub { font-size:11.5px; color:var(--text-light); line-height:1.6; }
+    .section { padding:96px 32px; max-width:1000px; margin:0 auto; }
+    .section-tag { font-size:11px; font-weight:700; color:var(--green); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+    .section-title { font-family:'Zen Kaku Gothic New',sans-serif; font-size:clamp(22px,3.5vw,36px); font-weight:700; line-height:1.4; margin-bottom:16px; }
+    .section-lead { font-size:15px; color:var(--text-mid); line-height:1.9; max-width:540px; margin-bottom:40px; }
+    .diff-card { background:var(--green-light); border:1.5px solid rgba(45,140,78,0.2); border-radius:12px; padding:18px 22px; font-size:14px; line-height:1.75; }
+    .diff-card strong { color:var(--green); }
+    .line-layout { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+    @media(max-width:700px){ .line-layout{grid-template-columns:1fr} .section{padding:64px 20px} }
+    .voices-bg { background:var(--warm); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .voices-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
+    .voice-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:20px 22px; }
+    .voice-stars { color:#f5a623; font-size:13px; margin-bottom:10px; }
+    .voice-text { font-size:13.5px; color:var(--text-mid); line-height:1.8; margin-bottom:14px; }
+    .voice-from { font-size:12px; color:var(--text-light); font-weight:600; }
+    .apply-section { text-align:center; padding:96px 32px; max-width:640px; margin:0 auto; }
+    .apply-section .section-lead { margin:0 auto 40px; text-align:center; }
+    .apply-form { background:#fff; border:1px solid var(--border); border-radius:16px; padding:32px; text-align:left; }
+    .form-group { margin-bottom:18px; }
+    .form-group label { display:block; font-size:12px; font-weight:700; margin-bottom:6px; }
+    .form-group label .req { color:var(--green); margin-left:4px; }
+    .form-group input, .form-group select, .form-group textarea { width:100%; padding:10px 14px; font-size:14px; font-family:inherit; color:var(--text); background:var(--cream); border:1.5px solid var(--border); border-radius:8px; outline:none; transition:border-color 0.18s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--green); background:#fff; }
+    .form-group textarea { resize:vertical; min-height:80px; }
+    .form-submit { width:100%; padding:14px; font-size:15px; font-weight:700; color:#fff; background:var(--green); border:none; border-radius:8px; cursor:pointer; transition:all 0.18s; margin-top:8px; }
+    .form-submit:hover { background:#236b3d; transform:translateY(-1px); }
+    .form-submit:disabled { background:#aaa; cursor:not-allowed; transform:none; }
+    .form-note { text-align:center; font-size:11.5px; color:var(--text-light); margin-top:14px; }
+    .success-msg { display:none; background:var(--green-light); border:1.5px solid var(--green); border-radius:12px; padding:24px; text-align:center; margin-top:16px; }
+    .success-msg .icon { font-size:36px; margin-bottom:8px; }
+    .success-msg h3 { font-size:16px; font-weight:700; color:var(--green); margin-bottom:6px; }
+    .success-msg p { font-size:13px; color:var(--text-mid); }
+    .error-msg { display:none; background:#fef2f2; border:1.5px solid #fca5a5; border-radius:8px; padding:12px 16px; font-size:13px; color:#dc2626; margin-top:8px; }
+    footer { background:#1a1a1a; color:rgba(255,255,255,0.4); text-align:center; padding:40px 24px; font-size:12px; line-height:2; }
+    footer strong { color:rgba(255,255,255,0.7); }
   </style>
 </head>
 <body>
 
-<!-- ヘッダー -->
 <header>
   <div class="logo">ECC<em>ジュニア</em> 中島教室</div>
   <nav>
@@ -530,46 +104,28 @@
   </nav>
 </header>
 
-<!-- ヒーロー -->
 <section class="hero">
   <div class="hero-left">
     <div class="hero-eyebrow">毎回の動画レポートつき</div>
     <h1>「今日は何したの？」に、<br><span class="underline">最高の笑顔で</span><br>答えられるように</h1>
-    <p class="hero-desc">
-      教室での「わが子の輝き」を、毎回LINEでお届け。<br>
-      写真・動画つきのレポートで、おうちでの親子の会話がもっと弾みます。
-    </p>
+    <p class="hero-desc">教室での「わが子の輝き」を、毎回LINEでお届け。写真・動画つきのレポートで、おうちでの親子の会話がもっと弾みます。</p>
     <div class="hero-actions">
       <a href="#apply" class="btn btn-main">無料体験を申し込む →</a>
       <a href="#line" class="btn btn-ghost">レポートを見る</a>
     </div>
   </div>
-
   <div class="hero-right">
     <div class="phone-wrap">
       <div class="phone">
         <div class="phone-screen">
           <div class="line-bar">
             <div class="line-bar-icon">📚</div>
-            <div class="line-bar-info">
-              <div class="n">ECCジュニア 中島教室</div>
-              <div class="s">レッスンレポート</div>
-            </div>
+            <div class="line-bar-info"><div class="n">ECCジュニア 中島教室</div><div class="s">レッスンレポート</div></div>
           </div>
           <div class="line-body">
-            <div class="lm">
-              <div class="lm-name">中島先生</div>
-              今日も元気いっぱいでした！🌟
-            </div>
-            <div class="lm">
-              <div class="lm-name">中島先生</div>
-              「apple」の発音、とっても上手に言えましたよ！お家でも聞いてみてください😊
-              <div class="lm-img">🎬</div>
-            </div>
-            <div class="lm">
-              <div class="lm-name">中島先生</div>
-              次回は単語ゲームをします🃏 楽しみにしていてください！
-            </div>
+            <div class="lm"><div class="lm-name">中島先生</div>今日も元気いっぱいでした！🌟</div>
+            <div class="lm"><div class="lm-name">中島先生</div>「apple」の発音、とっても上手に言えましたよ！😊<div class="lm-img">🎬</div></div>
+            <div class="lm"><div class="lm-name">中島先生</div>次回は単語ゲームをします🃏 楽しみに！</div>
           </div>
         </div>
       </div>
@@ -577,116 +133,69 @@
   </div>
 </section>
 
-<!-- 信頼バー -->
 <div class="trust-bar">
   <div class="trust-inner">
-    <div class="trust-item">
-      <div class="trust-icon">📱</div>
-      <div class="trust-label">毎回LINEで届く</div>
-      <div class="trust-sub">レッスンのたびに<br>写真・動画つきレポート</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-icon">🎬</div>
-      <div class="trust-label">動画ハイライト</div>
-      <div class="trust-sub">他のECC教室では<br>やっていないポイント</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-icon">👨‍👩‍👧</div>
-      <div class="trust-label">親子の会話が弾む</div>
-      <div class="trust-sub">おうちに帰ってから<br>子どもが話してくれる</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-icon">✅</div>
-      <div class="trust-label">安心して任せられる</div>
-      <div class="trust-sub">教室の様子が<br>毎回わかるから安心</div>
-    </div>
+    <div class="trust-item"><div class="trust-icon">📱</div><div class="trust-label">毎回LINEで届く</div><div class="trust-sub">レッスンのたびに<br>写真・動画つきレポート</div></div>
+    <div class="trust-item"><div class="trust-icon">🎬</div><div class="trust-label">動画ハイライト</div><div class="trust-sub">他のECC教室では<br>やっていないポイント</div></div>
+    <div class="trust-item"><div class="trust-icon">👨‍👩‍👧</div><div class="trust-label">親子の会話が弾む</div><div class="trust-sub">おうちに帰ってから<br>子どもが話してくれる</div></div>
+    <div class="trust-item"><div class="trust-icon">✅</div><div class="trust-label">安心して任せられる</div><div class="trust-sub">教室の様子が<br>毎回わかるから安心</div></div>
   </div>
 </div>
 
-<!-- LINEレポートセクション -->
 <section class="section" id="line">
   <div class="line-layout">
     <div>
       <div class="section-tag">LINE Report</div>
       <h2 class="section-title">わが子の輝きを、<br>毎回お手元に</h2>
-      <p class="section-lead">
-        「教室での様子がわからない」という不安を、安心と喜びに変えたい。
-        頑張って発音した単語、キラキラした表情で取り組んだワーク——
-        講師の目を通した輝きを、写真・動画とともに共有します。
-      </p>
-      <div class="diff-card">
-        ⚡ <strong>他のECC教室の先生はやっていないポイント</strong><br>
-        毎回のレッスンのハイライトを<strong>動画でお送りしています。</strong>
-        おうちに帰ってからの親子の会話の懸け橋を目指しています。
-      </div>
+      <p class="section-lead">「教室での様子がわからない」という不安を、安心と喜びに変えたい。頑張って発音した単語、キラキラした表情——講師の目を通した輝きを、写真・動画とともに共有します。</p>
+      <div class="diff-card">⚡ <strong>他のECC教室の先生はやっていないポイント</strong><br>毎回のレッスンのハイライトを<strong>動画でお送りしています。</strong>おうちに帰ってからの親子の会話の懸け橋を目指しています。</div>
     </div>
-    <div style="background:#fff; border:1px solid var(--border); border-radius:16px; padding:28px;">
-      <p style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:14px; letter-spacing:1px;">SAMPLE REPORT</p>
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; gap:10px; align-items:flex-start;">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;">
+      <p style="font-size:12px;font-weight:700;color:var(--text-light);margin-bottom:14px;letter-spacing:1px;">SAMPLE REPORT</p>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
           <div style="width:36px;height:36px;background:var(--green-light);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">👩‍🏫</div>
-          <div style="background:#f0f0f0;border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:#1a1a1a;line-height:1.7;">
-            <strong style="color:var(--green);font-size:12px;">中島先生</strong><br>
-            今日は「I like ○○.」の文を練習しました。最初は恥ずかしそうにしていましたが、最後には大きな声で言えました！
-          </div>
+          <div style="background:#f0f0f0;border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:#1a1a1a;line-height:1.7;"><strong style="color:var(--green);font-size:12px;">中島先生</strong><br>今日は「I like ○○.」の文を練習しました。最後には大きな声で言えました！</div>
         </div>
-        <div style="display:flex; gap:10px; align-items:flex-start;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
           <div style="width:36px;height:36px;background:var(--green-light);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">👩‍🏫</div>
-          <div style="background:#f0f0f0;border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:#1a1a1a;line-height:1.7;">
-            <strong style="color:var(--green);font-size:12px;">中島先生</strong><br>
-            🎬 発音している動画を撮りました。ぜひ褒めてあげてください！
-            <div style="margin-top:8px;background:linear-gradient(135deg,#c8f0d8,#a8e4be);border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--green);font-weight:600;">▶ 動画を再生する</div>
-          </div>
+          <div style="background:#f0f0f0;border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:#1a1a1a;line-height:1.7;"><strong style="color:var(--green);font-size:12px;">中島先生</strong><br>🎬 発音の動画を撮りました。ぜひ褒めてあげてください！<div style="margin-top:8px;background:linear-gradient(135deg,#c8f0d8,#a8e4be);border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--green);font-weight:600;">▶ 動画を再生する</div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 保護者の声 -->
 <div class="voices-bg" id="voices">
   <section class="section">
     <div class="section-tag">Voice</div>
     <h2 class="section-title">保護者の方からの声</h2>
     <p class="section-lead">毎回のLINEレポートを受け取った保護者の方から、うれしいご感想をいただいています。</p>
     <div class="voices-grid">
-      <div class="voice-card">
-        <div class="voice-stars">★★★★★</div>
-        <p class="voice-text">「今日どうだった？」と聞いても「ふつう」としか言わなかった子が、先生のLINEを見せると「これやったよ！」と話してくれるようになりました。</p>
-        <div class="voice-from">小2・女の子のお母さま</div>
-      </div>
-      <div class="voice-card">
-        <div class="voice-stars">★★★★★</div>
-        <p class="voice-text">動画が届くのが毎回楽しみです。恥ずかしそうに発音している姿がかわいくて、家族みんなで見ています。成長が目に見えてわかるのがいい。</p>
-        <div class="voice-from">小4・男の子のお父さま</div>
-      </div>
-      <div class="voice-card">
-        <div class="voice-stars">★★★★★</div>
-        <p class="voice-text">教室での様子が全くわからないのが不安だったのですが、毎回レポートが届くので安心して通わせられます。先生の愛情が伝わります。</p>
-        <div class="voice-from">年長・女の子のお母さま</div>
-      </div>
+      <div class="voice-card"><div class="voice-stars">★★★★★</div><p class="voice-text">「今日どうだった？」と聞いても「ふつう」としか言わなかった子が、先生のLINEを見せると「これやったよ！」と話してくれるようになりました。</p><div class="voice-from">小2・女の子のお母さま</div></div>
+      <div class="voice-card"><div class="voice-stars">★★★★★</div><p class="voice-text">動画が届くのが毎回楽しみです。恥ずかしそうに発音している姿がかわいくて、家族みんなで見ています。成長が目に見えてわかります。</p><div class="voice-from">小4・男の子のお父さま</div></div>
+      <div class="voice-card"><div class="voice-stars">★★★★★</div><p class="voice-text">教室の様子が全くわからないのが不安でしたが、毎回レポートが届くので安心して通わせられます。先生の愛情が伝わります。</p><div class="voice-from">年長・女の子のお母さま</div></div>
     </div>
   </section>
 </div>
 
-<!-- 体験申込 -->
 <section id="apply">
   <div class="apply-section">
     <div class="section-tag" style="text-align:center;">Free Trial</div>
     <h2 class="section-title">まずは無料体験から</h2>
     <p class="section-lead">お気軽にお申し込みください。授業の雰囲気やLINEレポートの実際を、体験レッスンで確認いただけます。</p>
-    <div class="apply-form">
+    <div class="apply-form" id="apply-form">
       <div class="form-group">
         <label>お名前（保護者）<span class="req">*</span></label>
-        <input type="text" placeholder="山田 花子">
+        <input type="text" id="f-name" placeholder="山田 花子">
       </div>
       <div class="form-group">
         <label>メールアドレス<span class="req">*</span></label>
-        <input type="email" placeholder="example@email.com">
+        <input type="email" id="f-email" placeholder="example@email.com">
       </div>
       <div class="form-group">
         <label>お子さまの学年</label>
-        <select>
+        <select id="f-grade">
           <option value="">選んでください</option>
           <option>年少・年中・年長</option>
           <option>小学1年生</option>
@@ -700,20 +209,72 @@
       </div>
       <div class="form-group">
         <label>ご質問・ご要望</label>
-        <textarea placeholder="ご自由にどうぞ（任意）"></textarea>
+        <textarea id="f-message" placeholder="ご自由にどうぞ（任意）"></textarea>
       </div>
-      <button class="form-submit">無料体験を申し込む →</button>
+      <div class="error-msg" id="error-msg">⚠️ お名前とメールアドレスは必須です。</div>
+      <button class="form-submit" id="submit-btn" onclick="submitForm()">無料体験を申し込む →</button>
       <p class="form-note">📩 2営業日以内にご連絡いたします。しつこい勧誘は一切しません。</p>
+    </div>
+    <div class="success-msg" id="success-msg">
+      <div class="icon">🎉</div>
+      <h3>お申し込みありがとうございます！</h3>
+      <p>2営業日以内にご連絡いたします。<br>しばらくお待ちください。</p>
     </div>
   </div>
 </section>
 
-<!-- フッター -->
 <footer>
   <strong>ECCジュニア 中島教室</strong><br>
   「今日は何したの？」に、最高の笑顔で答えられるように<br><br>
   © 2024 ECCジュニア 中島教室
 </footer>
 
+<script>
+  // ========================================
+  // ⚠️ ここを自分のSupabase情報に書き換える
+  // ========================================
+  const SUPABASE_URL = 'https://oyptlspwkahlwwmwvuzm.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95cHRsc3B3a2FobHd3bXd2dXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NTA2MDgsImV4cCI6MjA5MDMyNjYwOH0.sUgKk_OlIII5JvqY1EMe9P1IX9tef_4KCzkE7Ymm8PY'
+  // ========================================
+
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  async function submitForm() {
+    const name    = document.getElementById('f-name').value.trim()
+    const email   = document.getElementById('f-email').value.trim()
+    const grade   = document.getElementById('f-grade').value
+    const message = document.getElementById('f-message').value.trim()
+    const errorEl = document.getElementById('error-msg')
+    const btn     = document.getElementById('submit-btn')
+
+    if (!name || !email) {
+      errorEl.style.display = 'block'
+      return
+    }
+    errorEl.style.display = 'none'
+    btn.disabled = true
+    btn.textContent = '送信中...'
+
+    try {
+      const { error } = await db.from('inquiries').insert({
+        name:         name,
+        email:        email,
+        inquiry_type: grade ? `体験申込（${grade}）` : '体験申込',
+        message:      message,
+      })
+      if (error) throw error
+      document.getElementById('apply-form').style.display = 'none'
+      document.getElementById('success-msg').style.display = 'block'
+      document.getElementById('success-msg').scrollIntoView({ behavior:'smooth' })
+    } catch(err) {
+      console.error(err)
+      btn.disabled = false
+      btn.textContent = '無料体験を申し込む →'
+      errorEl.textContent = '⚠️ 送信に失敗しました。しばらくしてから再度お試しください。'
+      errorEl.style.display = 'block'
+    }
+  }
+</script>
 </body>
 </html>
