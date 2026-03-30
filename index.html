@@ -69,6 +69,9 @@
       content:''; position:absolute; bottom:0; left:0; right:0;
       height:7px; background:rgba(74,171,109,0.28); border-radius:4px; z-index:-1;
     }
+    .br-pc { display:none; }
+    @media(min-width:768px){ .br-pc { display:inline; } }
+
     .hero-desc { font-size:14px; color:var(--text-mid); line-height:1.9; margin-bottom:28px; max-width:440px; }
     @media(max-width:767px){ .hero-desc { margin:0 auto 28px; } }
 
@@ -162,11 +165,32 @@
     .voice-text { font-size:13px; color:var(--text-mid); line-height:1.8; margin-bottom:12px; }
     .voice-from { font-size:11px; color:var(--text-light); font-weight:600; }
 
-    /* ── 申込フォーム ── */
-    .apply-wrap { padding:72px 20px; max-width:560px; margin:0 auto; text-align:center; }
-    @media(min-width:768px){ .apply-wrap { padding:96px 40px; } }
-    .apply-wrap .section-lead { margin:0 auto 32px; }
-    .apply-form { background:#fff; border:1px solid var(--border); border-radius:16px; padding:24px; text-align:left; }
+    /* ── 無料体験CTAバナー ── */
+    .cta-banner {
+      background:var(--green); padding:56px 20px; text-align:center;
+    }
+    .cta-banner h2 {
+      font-family:'Zen Kaku Gothic New',sans-serif;
+      font-size:clamp(20px,4vw,30px); font-weight:700;
+      color:#fff; margin-bottom:12px; line-height:1.4;
+    }
+    .cta-banner p { font-size:14px; color:rgba(255,255,255,0.8); margin-bottom:28px; }
+    .cta-banner .btn-white {
+      display:inline-flex; align-items:center; gap:6px;
+      background:#fff; color:var(--green);
+      font-size:15px; font-weight:700;
+      padding:14px 32px; border-radius:8px;
+      text-decoration:none; transition:all 0.18s;
+      box-shadow:0 4px 16px rgba(0,0,0,0.12);
+    }
+    .cta-banner .btn-white:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.16); }
+    .cta-banner .btn-note { font-size:11px; color:rgba(255,255,255,0.6); margin-top:14px; }
+
+    /* ── お問い合わせフォーム ── */
+    .contact-wrap { padding:72px 20px; max-width:560px; margin:0 auto; text-align:center; }
+    @media(min-width:768px){ .contact-wrap { padding:96px 40px; } }
+    .contact-wrap .section-lead { margin:0 auto 32px; }
+    .contact-form { background:#fff; border:1px solid var(--border); border-radius:16px; padding:24px; text-align:left; }
     .form-group { margin-bottom:16px; }
     .form-group label { display:block; font-size:11px; font-weight:700; margin-bottom:5px; }
     .form-group label .req { color:var(--green); margin-left:3px; }
@@ -177,13 +201,12 @@
       font-family:inherit; color:var(--text);
       background:var(--cream); border:1.5px solid var(--border);
       border-radius:8px; outline:none; transition:border-color 0.18s;
-      -webkit-appearance:none;
-      appearance: none;
+      -webkit-appearance:none; appearance:none;
     }
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus { border-color:var(--green); background:#fff; }
-    .form-group textarea { resize:vertical; min-height:80px; }
+    .form-group textarea { resize:vertical; min-height:100px; }
     .form-submit {
       width:100%; padding:14px; font-size:15px; font-weight:700;
       color:#fff; background:var(--green); border:none;
@@ -209,9 +232,9 @@
 <header>
   <div class="logo">ECC<em>ジュニア</em> 中島教室</div>
   <nav>
-    <a href="#line" class="nav-link">LINE</a>
-    <a href="#voices" class="nav-link">保護者の声</a>
-    <a href="#apply" class="nav-cta">無料体験</a>
+    <a href="#line" class="nav-link">LINEレポート</a>
+    <a href="#contact" class="nav-link">お問い合わせ</a>
+    <a href="https://www.eccjr.co.jp/contactus/" target="_blank" class="nav-cta">無料体験</a>
   </nav>
 </header>
 
@@ -219,10 +242,10 @@
 <section class="hero">
   <div class="hero-left">
     <div class="hero-eyebrow">毎回の動画レポートつき</div>
-    <h1>「今日は何したの？」に、<br><span class="underline">最高の笑顔で</span><br>答えられるように</h1>
+    <h1>「今日は何したの？」に、<span class="br-pc"><br></span><span class="underline">最高の笑顔で</span><span class="br-pc"><br></span>答えられるように</h1>
     <p class="hero-desc">教室での「わが子の輝き」を、毎回LINEでお届け。写真・動画つきのレポートで、おうちでの親子の会話がもっと弾みます。</p>
     <div class="hero-actions">
-      <a href="#apply" class="btn btn-main">無料体験を申し込む →</a>
+      <a href="https://www.eccjr.co.jp/contactus/" target="_blank" class="btn btn-main">無料体験を申し込む →</a>
       <a href="#line" class="btn btn-ghost">レポートを見る</a>
     </div>
   </div>
@@ -263,7 +286,7 @@
   <div class="line-layout">
     <div>
       <div class="section-tag">LINE Report</div>
-      <h2 class="section-title">わが子の輝きを、<br>毎回お手元に</h2>
+      <h2 class="section-title">わが子の輝きを、毎回お手元に</h2>
       <p class="section-lead">「教室での様子がわからない」という不安を、安心と喜びに変えたい。頑張って発音した単語、キラキラした表情——講師の目を通した輝きを、写真・動画とともに共有します。</p>
       <div class="diff-card">⚡ <strong>他のECC教室の先生はやっていないポイント</strong><br>毎回のレッスンのハイライトを<strong>動画でお送りしています。</strong>おうちに帰ってからの親子の会話の懸け橋を目指しています。</div>
     </div>
@@ -297,15 +320,23 @@
   </section>
 </div>
 
-<!-- 体験申込 -->
-<section id="apply">
-  <div class="apply-wrap">
-    <div class="section-tag" style="text-align:center;">Free Trial</div>
-    <h2 class="section-title">まずは無料体験から</h2>
-    <p class="section-lead">お気軽にお申し込みください。授業の雰囲気やLINEレポートの実際を、体験レッスンで確認いただけます。</p>
-    <div class="apply-form" id="apply-form">
+<!-- 無料体験CTAバナー -->
+<div class="cta-banner">
+  <h2>まずは無料体験から<br>始めてみませんか？</h2>
+  <p>入会金・授業料など一切かかりません。お気軽にどうぞ。</p>
+  <a href="https://www.eccjr.co.jp/contactus/" target="_blank" class="btn-white">無料体験を申し込む →</a>
+  <p class="btn-note">ECC公式サイトの申込フォームに移動します</p>
+</div>
+
+<!-- お問い合わせフォーム -->
+<section id="contact">
+  <div class="contact-wrap">
+    <div class="section-tag" style="text-align:center;">Contact</div>
+    <h2 class="section-title">お問い合わせ</h2>
+    <p class="section-lead">ご質問やご不明な点はお気軽にお問い合わせください。2営業日以内にご返信いたします。</p>
+    <div class="contact-form" id="contact-form">
       <div class="form-group">
-        <label>お名前（保護者）<span class="req">*</span></label>
+        <label>お名前<span class="req">*</span></label>
         <input type="text" id="f-name" placeholder="山田 花子">
       </div>
       <div class="form-group">
@@ -327,16 +358,16 @@
         </select>
       </div>
       <div class="form-group">
-        <label>ご質問・ご要望</label>
-        <textarea id="f-message" placeholder="ご自由にどうぞ（任意）"></textarea>
+        <label>ご質問・ご要望<span class="req">*</span></label>
+        <textarea id="f-message" placeholder="お気軽にどうぞ"></textarea>
       </div>
-      <div class="error-msg" id="error-msg">⚠️ お名前とメールアドレスは必須です。</div>
-      <button class="form-submit" id="submit-btn" onclick="submitForm()">無料体験を申し込む →</button>
-      <p class="form-note">📩 2営業日以内にご連絡いたします。しつこい勧誘は一切しません。</p>
+      <div class="error-msg" id="error-msg">⚠️ お名前・メールアドレス・ご質問は必須です。</div>
+      <button class="form-submit" id="submit-btn" onclick="submitForm()">送信する →</button>
+      <p class="form-note">📩 2営業日以内にご連絡いたします。</p>
     </div>
     <div class="success-msg" id="success-msg">
       <div class="icon">🎉</div>
-      <h3>お申し込みありがとうございます！</h3>
+      <h3>お問い合わせありがとうございます！</h3>
       <p>2営業日以内にご連絡いたします。<br>しばらくお待ちください。</p>
     </div>
   </div>
@@ -350,8 +381,13 @@
 </footer>
 
 <script>
-  const SUPABASE_URL      = 'あなたのProject URL'
-  const SUPABASE_ANON_KEY = 'あなたのanon key'
+  // ========================================
+  // ⚠️ ここを自分のSupabase情報に書き換える
+  // ========================================
+  const SUPABASE_URL      = 'https://oyptlspwkahlwwmwvuzm.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95cHRsc3B3a2FobHd3bXd2dXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NTA2MDgsImV4cCI6MjA5MDMyNjYwOH0.sUgKk_OlIII5JvqY1EMe9P1IX9tef_4KCzkE7Ymm8PY'
+  // ========================================
+
   const { createClient } = supabase
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
@@ -362,23 +398,29 @@
     const message = document.getElementById('f-message').value.trim()
     const errorEl = document.getElementById('error-msg')
     const btn     = document.getElementById('submit-btn')
-    if (!name || !email) { errorEl.style.display='block'; return }
+
+    if (!name || !email || !message) {
+      errorEl.style.display = 'block'
+      return
+    }
     errorEl.style.display = 'none'
     btn.disabled = true
     btn.textContent = '送信中...'
+
     try {
       const { error } = await db.from('inquiries').insert({
-        name, email,
-        inquiry_type: grade ? `体験申込（${grade}）` : '体験申込',
+        name,
+        email,
+        inquiry_type: grade ? `お問い合わせ（${grade}）` : 'お問い合わせ',
         message,
       })
       if (error) throw error
-      document.getElementById('apply-form').style.display = 'none'
-      document.getElementById('success-msg').style.display = 'block'
+      document.getElementById('contact-form').style.display = 'none'
+      document.getElementById('success-msg').style.display  = 'block'
       document.getElementById('success-msg').scrollIntoView({ behavior:'smooth' })
     } catch(err) {
       btn.disabled = false
-      btn.textContent = '無料体験を申し込む →'
+      btn.textContent = '送信する →'
       errorEl.textContent = '⚠️ 送信に失敗しました。しばらくしてから再度お試しください。'
       errorEl.style.display = 'block'
     }
